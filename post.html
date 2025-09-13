@@ -30,7 +30,10 @@
       fetch("posts/" + file)
         .then(res => res.text())
         .then(md => {
-          document.getElementById("content").innerHTML = marked.parse(md);
+          const htmlContent = marked.parse(md);
+          // 修复图片路径：将相对路径转换为正确的路径
+          const fixedContent = htmlContent.replace(/src="images\//g, 'src="posts/images/');
+          document.getElementById("content").innerHTML = fixedContent;
         })
         .catch(err => {
           document.getElementById("content").innerHTML = "<p>无法加载文章。</p>";
