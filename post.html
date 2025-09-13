@@ -177,11 +177,15 @@
       const post = postsData.find(p => p.file === file);
       
       if (post) {
+        // 设置文章标题
+        document.title = `${post.title} - HUI Blog`;
+        
         // 尝试读取markdown文件
-        fetch("posts/" + file)
+        const fetchUrl = `./posts/${file}`;
+        fetch(fetchUrl)
           .then(res => {
             if (!res.ok) {
-              throw new Error('文件读取失败');
+              throw new Error(`HTTP ${res.status}: ${res.statusText}`);
             }
             return res.text();
           })
@@ -192,14 +196,21 @@
             document.getElementById("content").innerHTML = fixedContent;
           })
           .catch(err => {
+            console.error('Fetch error:', err);
             // 如果fetch失败，显示文章基本信息
             const fallbackContent = `
               <h1>${post.title}</h1>
               <p><strong>发布日期：</strong>${post.date}</p>
               <p><strong>标签：</strong>${post.tags.join(', ')}</p>
               ${post.image ? `<img src="${post.image}" alt="文章图片" style="max-width: 100%; height: auto;">` : ''}
-              <p><em>抱歉，无法加载完整的文章内容。这可能是由于GitHub Pages的限制导致的。</em></p>
-              <p><a href="posts/${file}" target="_blank">点击这里查看原始markdown文件</a></p>
+              <div style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                <p><em>💡 由于GitHub Pages的静态文件限制，无法动态加载markdown内容。</em></p>
+                <p><strong>解决方案：</strong></p>
+                <ul>
+                  <li><a href="https://raw.githubusercontent.com/yourusername/HUIblog/main/posts/${file}" target="_blank">查看原始markdown文件</a></li>
+                  <li>或者在本地环境中查看完整内容</li>
+                </ul>
+              </div>
             `;
             document.getElementById("content").innerHTML = fallbackContent;
           });
