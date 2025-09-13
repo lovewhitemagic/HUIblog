@@ -81,7 +81,7 @@ function convertMarkdownToHtml(mdFile) {
     const htmlContent = marked.parse(content);
     
     // 修复图片路径
-    const fixedContent = htmlContent.replace(/src="images\//g, 'src="../images/');
+    const fixedContent = htmlContent.replace(/src="images\//g, 'src="posts/images/');
     
     // 写入HTML文件
     fs.writeFileSync(htmlPath, fixedContent, 'utf8');
