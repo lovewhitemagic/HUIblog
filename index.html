@@ -202,14 +202,16 @@
     }
   </style>
 </head>
-<body>
+  <body>
+    <!-- 引入文章数据文件 -->
+    <script src="posts-data.js"></script>
   <header>
     <h1>HUI Blog</h1>
     <div>
       <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
         <span class="theme-icon">🌙</span>
       </button>
-      <a href="index.html" style="margin-left: 1rem;">home</a>
+      <a href="index.html" style="margin-left: 1rem;">Home</a>
     </div>
   </header>
 
@@ -253,65 +255,8 @@
      async function loadPosts() {
        try {
          // 定义已知的markdown文件列表
-         const postFiles = [
-           { file: '20250715.md', date: '2025-07-15' },
-           { file: '20250424.md', date: '2025-04-24' },
-           { file: '20241110.md', date: '2024-11-10' },
-           { file: '20241007.md', date: '2024-10-07' }
-         ];
-         
-         const posts = [];
-         
-         // 读取每个markdown文件的元数据和图片
-         for (const postFile of postFiles) {
-           try {
-             const response = await fetch(`posts/${postFile.file}`);
-             const content = await response.text();
-             
-             // 解析front matter
-             const frontMatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
-             let title = `日记 ${postFile.date}`;
-             let tags = [];
-             
-             if (frontMatterMatch) {
-               const frontMatter = frontMatterMatch[1];
-               const titleMatch = frontMatter.match(/title:\s*(.+)/);
-               const tagsMatch = frontMatter.match(/tags:\s*\[([^\]]+)\]/);
-               
-               title = titleMatch ? titleMatch[1].trim() : title;
-               tags = tagsMatch ? tagsMatch[1].split(',').map(tag => tag.trim()) : [];
-             }
-             
-             // 解析文章中的图片
-             let image = null;
-             const imageMatches = content.match(/!\[.*?\]\((images\/[^)]+)\)/g);
-             if (imageMatches && imageMatches.length > 0) {
-               // 提取第一张图片的路径
-               const firstImageMatch = imageMatches[0].match(/!\[.*?\]\((images\/[^)]+)\)/);
-               if (firstImageMatch) {
-                 image = `posts/${firstImageMatch[1]}`;
-               }
-             }
-             
-             posts.push({
-               file: postFile.file,
-               date: postFile.date,
-               title: title,
-               image: image,
-               tags: tags
-             });
-           } catch (error) {
-             console.error(`Error loading ${postFile.file}:`, error);
-             // 如果读取失败，使用默认值
-             posts.push({
-               file: postFile.file,
-               date: postFile.date,
-               title: `日记 ${postFile.date}`,
-               image: null,
-               tags: []
-             });
-           }
-         }
+         // 使用外部文件中的文章数据
+          const posts = postsData;
          
          // 按日期倒序排列
          const sortedPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -368,8 +313,8 @@
       <a href="https://twitter.com/yourusername" title="Twitter">🐦</a>
     </div>
     <div class="footer-info">
-      <div>WANG Shudao • © 2025 • Indie Dev Weekly</div>
-      <div>Tailwind Next.js Theme</div>
+      <div>HUI Blog • © 2024 • Indie Dev blog</div>
+      <div>peace & love</div>
     </div>
   </footer>
 </body>
