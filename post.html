@@ -180,39 +180,50 @@
         // 设置文章标题
         document.title = `${post.title} - HUI Blog`;
         
-        // 尝试读取markdown文件
-        const fetchUrl = `./posts/${file}`;
-        fetch(fetchUrl)
+        // 直接加载预编译的HTML文件
+        const htmlUrl = `./posts/html/${file}`;
+        fetch(htmlUrl)
           .then(res => {
             if (!res.ok) {
               throw new Error(`HTTP ${res.status}: ${res.statusText}`);
             }
             return res.text();
           })
-          .then(md => {
-            const htmlContent = marked.parse(md);
-            // 修复图片路径：将相对路径转换为正确的路径
-            const fixedContent = htmlContent.replace(/src="images\//g, 'src="posts/images/');
-            document.getElementById("content").innerHTML = fixedContent;
+          .then(htmlContent => {
+            // 添加文章标题和元信息
+            const fullContent = `
+              <h1>${post.title}</h1>
+              <div style="margin-bottom: 2rem; color: var(--date-color); border-bottom: 1px solid var(--header-border); padding-bottom: 1rem;">
+                <p><strong>📅 发布日期：</strong>${post.date}</p>
+                <div style="margin-top: 1rem;">
+                  <strong>🏷️ 标签：</strong>
+                  ${post.tags.map(tag => `<span style="display: inline-block; background: var(--bg-secondary); padding: 0.2rem 0.5rem; margin: 0.2rem; border-radius: 4px; font-size: 0.9rem;">${tag}</span>`).join('')}
+                </div>
+              </div>
+              ${htmlContent}
+            `;
+            document.getElementById("content").innerHTML = fullContent;
           })
           .catch(err => {
-            console.error('Fetch error:', err);
-            // 如果fetch失败，显示文章基本信息
-            const fallbackContent = `
+            console.error('加载HTML文件失败:', err);
+            // 如果HTML文件加载失败，显示错误信息
+            const errorContent = `
               <h1>${post.title}</h1>
-              <p><strong>发布日期：</strong>${post.date}</p>
-              <p><strong>标签：</strong>${post.tags.join(', ')}</p>
-              ${post.image ? `<img src="${post.image}" alt="文章图片" style="max-width: 100%; height: auto;">` : ''}
-              <div style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
-                <p><em>💡 由于GitHub Pages的静态文件限制，无法动态加载markdown内容。</em></p>
-                <p><strong>解决方案：</strong></p>
-                <ul>
-                  <li><a href="https://raw.githubusercontent.com/yourusername/HUIblog/main/posts/${file}" target="_blank">查看原始markdown文件</a></li>
-                  <li>或者在本地环境中查看完整内容</li>
-                </ul>
+              <div style="margin-bottom: 2rem; color: var(--date-color);">
+                <p><strong>📅 发布日期：</strong>${post.date}</p>
+                <div style="margin-top: 1rem;">
+                  <strong>🏷️ 标签：</strong>
+                  ${post.tags.map(tag => `<span style="display: inline-block; background: var(--bg-secondary); padding: 0.2rem 0.5rem; margin: 0.2rem; border-radius: 4px; font-size: 0.9rem;">${tag}</span>`).join('')}
+                </div>
+              </div>
+              ${post.image ? `<img src="${post.image}" alt="${post.title}" style="max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 2rem;">` : ''}
+              <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                <h3>⚠️ 文章加载失败</h3>
+                <p>无法加载文章内容，错误信息：${err.message}</p>
+                <p>请检查文件路径是否正确：<code>posts/html/${file}</code></p>
               </div>
             `;
-            document.getElementById("content").innerHTML = fallbackContent;
+            document.getElementById("content").innerHTML = errorContent;
           });
       } else {
         document.getElementById("content").innerHTML = "<p>未找到指定的文章。</p>";
