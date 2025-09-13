@@ -5,24 +5,115 @@
   <title>Blog Detail</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    body { font-family: sans-serif; max-width: 700px; margin: auto; }
-    header { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #ddd; }
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --header-border: #ddd;
+      --link-color: #06c;
+    }
+    
+    [data-theme="dark"] {
+      --bg-color: #1a1a1a;
+      --text-color: #e0e0e0;
+      --header-border: #444;
+      --link-color: #66b3ff;
+    }
+    
+    body { 
+      font-family: sans-serif; 
+      max-width: 700px; 
+      margin: auto;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      padding: 1rem 0; 
+      border-bottom: 1px solid var(--header-border); 
+    }
+    
     h1 { margin: 0; font-size: 1.2rem; color: #c00; }
-    a { text-decoration: none; color: #06c; }
-    a:hover { text-decoration: underline; }
-    article { margin-top: 1rem; }
-    article img { max-width: 100%; height: auto; display: block; margin: 1rem 0; }
+    
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    
+    .theme-toggle:hover {
+      background-color: rgba(128, 128, 128, 0.1);
+    }
+    
+    a { 
+      text-decoration: none; 
+      color: var(--link-color); 
+    }
+    
+    a:hover { 
+      text-decoration: underline; 
+    }
+    
+    article { 
+      margin-top: 1rem; 
+    }
+    
+    article img { 
+      max-width: 100%; 
+      height: auto; 
+      display: block; 
+      margin: 1rem 0; 
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>My Blog</h1>
-    <a href="index.html">home</a>
+    <div>
+      <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
+        <span class="theme-icon">🌙</span>
+      </button>
+      <a href="index.html" style="margin-left: 1rem;">home</a>
+    </div>
   </header>
 
   <article id="content">加载中...</article>
 
   <script>
+    // 主题切换功能
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.querySelector('.theme-icon');
+      
+      if (html.getAttribute('data-theme') === 'dark') {
+        html.removeAttribute('data-theme');
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+    
+    // 页面加载时恢复主题设置
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedTheme = localStorage.getItem('theme');
+      const themeIcon = document.querySelector('.theme-icon');
+      
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+      }
+    });
+
     // 获取 URL 参数中的 file
     const params = new URLSearchParams(window.location.search);
     const file = params.get("file");

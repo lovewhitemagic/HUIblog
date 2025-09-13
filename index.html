@@ -4,27 +4,201 @@
   <meta charset="UTF-8">
   <title>My Blog</title>
   <style>
-    body { font-family: sans-serif; max-width: 700px; margin: auto; }
-    header { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #ddd; }
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --header-border: #ddd;
+      --link-color: #06c;
+      --date-color: #999;
+      --month-bg: #f8f9fa;
+      --month-border: #e9ecef;
+    }
+    
+    [data-theme="dark"] {
+      --bg-color: #1a1a1a;
+      --text-color: #e0e0e0;
+      --header-border: #444;
+      --link-color: #66b3ff;
+      --date-color: #888;
+      --month-bg: #2d2d2d;
+      --month-border: #444;
+    }
+    
+    body { 
+      font-family: sans-serif; 
+      max-width: 700px; 
+      margin: auto; 
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      padding: 1rem 0; 
+      border-bottom: 1px solid var(--header-border); 
+    }
+    
     h1 { margin: 0; font-size: 1.2rem; color: #c00; }
-    .post-list { list-style: none; padding: 0; }
-    .post-list li { margin: 0.5rem 0; }
-    .date { color: #999; font-size: 0.9rem; margin-right: 10px; }
-    a { text-decoration: none; color: #06c; }
-    a:hover { text-decoration: underline; }
+    
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    
+    .theme-toggle:hover {
+      background-color: var(--month-bg);
+    }
+    
+    .month-group {
+      margin: 2rem 0;
+    }
+    
+    .month-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-color);
+      background-color: var(--month-bg);
+      padding: 0.5rem 1rem;
+      border-left: 4px solid #c00;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+    }
+    
+    .post-list { 
+      list-style: none; 
+      padding: 0; 
+      margin-left: 1rem;
+    }
+    
+    .post-list li { 
+      margin: 0.5rem 0; 
+      display: flex;
+      align-items: center;
+    }
+    
+    .date { 
+      color: var(--date-color); 
+      font-size: 0.9rem; 
+      margin-right: 15px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      min-width: 80px;
+    }
+    
+    a { 
+      text-decoration: none; 
+      color: var(--link-color); 
+      flex: 1;
+    }
+    
+    a:hover { 
+      text-decoration: underline; 
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>My Blog</h1>
-    <a href="index.html">home</a>
+    <div>
+      <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
+        <span class="theme-icon">🌙</span>
+      </button>
+      <a href="index.html" style="margin-left: 1rem;">home</a>
+    </div>
   </header>
 
   <h2>Blog Posts</h2>
-  <ul class="post-list">
-    <li><span class="date">2023-05-30</span><a href="post.html?file=redwood-next.md">RedwoodJS’ Next Epoch: All In on React Server Components</a></li>
-    <li><span class="date">2022-05-23</span><a href="post.html?file=version-numbers.md">Major Version Numbers are Not Sacred</a></li>
-    <li><span class="date">2022-04-07</span><a href="post.html?file=startup-fund.md">Introducing the Redwood Startup Fund</a></li>
-  </ul>
+  
+  <div id="posts-container">
+    <p>加载中...</p>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.querySelector('.theme-icon');
+      
+      if (html.getAttribute('data-theme') === 'dark') {
+        html.removeAttribute('data-theme');
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+    
+    // 页面加载时恢复主题设置
+     document.addEventListener('DOMContentLoaded', function() {
+       const savedTheme = localStorage.getItem('theme');
+       const themeIcon = document.querySelector('.theme-icon');
+       
+       if (savedTheme === 'dark') {
+         document.documentElement.setAttribute('data-theme', 'dark');
+         themeIcon.textContent = '☀️';
+       }
+       
+       // 加载文章列表
+       loadPosts();
+     });
+     
+     // 动态加载文章列表
+     async function loadPosts() {
+       try {
+         // 定义已知的markdown文件列表
+         const posts = [
+           { filename: '20250715.md', date: '2025-07-15', title: '2025年7月15日' },
+           { filename: '20250424.md', date: '2025-04-24', title: '2025年4月24日' },
+           { filename: '20241110.md', date: '2024-11-10', title: '2024年11月10日' },
+           { filename: '20241007.md', date: '2024-10-07', title: '2024年10月7日' }
+         ];
+         
+         // 按月份分组
+         const groupedPosts = {};
+         posts.forEach(post => {
+           const monthKey = post.date.substring(0, 7); // YYYY-MM
+           if (!groupedPosts[monthKey]) {
+             groupedPosts[monthKey] = [];
+           }
+           groupedPosts[monthKey].push(post);
+         });
+         
+         // 按月份排序（最新的在前）
+         const sortedMonths = Object.keys(groupedPosts).sort((a, b) => b.localeCompare(a));
+         
+         // 生成HTML
+         let html = '';
+         sortedMonths.forEach(month => {
+           html += `<div class="month-group">`;
+           html += `<div class="month-title">${month}</div>`;
+           html += `<ul class="post-list">`;
+           
+           // 按日期排序（最新的在前）
+           const sortedPosts = groupedPosts[month].sort((a, b) => b.date.localeCompare(a.date));
+           
+           sortedPosts.forEach(post => {
+             const dateStr = post.date.substring(5); // MM-DD
+             html += `<li><span class="date">${dateStr}</span><a href="post.html?file=${post.filename}">${post.title}</a></li>`;
+           });
+           
+           html += `</ul>`;
+           html += `</div>`;
+         });
+         
+         document.getElementById('posts-container').innerHTML = html;
+       } catch (error) {
+         console.error('加载文章列表失败:', error);
+         document.getElementById('posts-container').innerHTML = '<p>加载文章列表失败</p>';
+       }
+     }
+  </script>
 </body>
 </html>
