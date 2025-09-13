@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Blog Detail</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 700px; margin: auto; }
+    header { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #ddd; }
+    h1 { margin: 0; font-size: 1.2rem; color: #c00; }
+    a { text-decoration: none; color: #06c; }
+    a:hover { text-decoration: underline; }
+    article { margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Blog</h1>
+    <a href="index.html">home</a>
+  </header>
+
+  <article id="content">加载中...</article>
+
+  <script>
+    // 获取 URL 参数中的 file
+    const params = new URLSearchParams(window.location.search);
+    const file = params.get("file");
+
+    if (file) {
+      fetch("posts/" + file)
+        .then(res => res.text())
+        .then(md => {
+          document.getElementById("content").innerHTML = marked.parse(md);
+        })
+        .catch(err => {
+          document.getElementById("content").innerHTML = "<p>无法加载文章。</p>";
+        });
+    } else {
+      document.getElementById("content").innerHTML = "<p>未指定文章。</p>";
+    }
+  </script>
+</body>
+</html>

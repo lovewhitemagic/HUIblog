@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>My Blog</title>
+  <style>
+    body { font-family: sans-serif; max-width: 700px; margin: auto; }
+    header { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #ddd; }
+    h1 { margin: 0; font-size: 1.2rem; color: #c00; }
+    .post-list { list-style: none; padding: 0; }
+    .post-list li { margin: 0.5rem 0; }
+    .date { color: #999; font-size: 0.9rem; margin-right: 10px; }
+    a { text-decoration: none; color: #06c; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Blog</h1>
+    <a href="index.html">home</a>
+  </header>
+
+  <h2>Blog Posts</h2>
+  <ul class="post-list">
+    <li><span class="date">2023-05-30</span><a href="post.html?file=redwood-next.md">RedwoodJS’ Next Epoch: All In on React Server Components</a></li>
+    <li><span class="date">2022-05-23</span><a href="post.html?file=version-numbers.md">Major Version Numbers are Not Sacred</a></li>
+    <li><span class="date">2022-04-07</span><a href="post.html?file=startup-fund.md">Introducing the Redwood Startup Fund</a></li>
+  </ul>
+</body>
+</html>
