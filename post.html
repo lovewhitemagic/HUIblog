@@ -65,11 +65,41 @@
       margin-top: 1rem; 
     }
     
-    article img { 
-      max-width: 100%; 
-      height: auto; 
-      display: block; 
-      margin: 1rem 0; 
+    article img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1rem 0;
+    }
+    
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 50px;
+      height: 50px;
+      background: var(--link-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+    
+    .back-to-top:hover {
+      background: var(--text-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .back-to-top.show {
+      display: flex;
     }
   </style>
 </head>
@@ -85,6 +115,8 @@
   </header>
 
   <article id="content">加载中...</article>
+  
+  <button class="back-to-top" onclick="scrollToTop()" title="返回顶部">↑</button>
 
   <script>
     // 主题切换功能
@@ -112,7 +144,26 @@
         document.documentElement.setAttribute('data-theme', 'dark');
         themeIcon.textContent = '☀️';
       }
+      
+      // 返回顶部按钮显示/隐藏逻辑
+      const backToTopBtn = document.querySelector('.back-to-top');
+      
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          backToTopBtn.classList.add('show');
+        } else {
+          backToTopBtn.classList.remove('show');
+        }
+      });
     });
+    
+    // 返回顶部功能
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
 
     // 获取 URL 参数中的 file
     const params = new URLSearchParams(window.location.search);

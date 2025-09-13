@@ -57,55 +57,154 @@
       background-color: var(--month-bg);
     }
     
-    .month-group {
-      margin: 2rem 0;
+    .post-item {
+      display: flex;
+      margin-bottom: 2rem;
+      background: var(--bg-color);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s ease;
     }
     
-    .month-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: var(--text-color);
-      background-color: var(--month-bg);
-      padding: 0.5rem 1rem;
-      border-left: 4px solid #c00;
-      margin-bottom: 1rem;
-      border-radius: 4px;
+    .post-item:hover {
+      transform: translateY(-2px);
     }
     
-    .post-list { 
-      list-style: none; 
-      padding: 0; 
-      margin-left: 1rem;
+    .post-image {
+      width: 200px;
+      height: 150px;
+      object-fit: cover;
+      flex-shrink: 0;
     }
     
-    .post-list li { 
-      margin: 0.5rem 0; 
+    .post-placeholder {
+      width: 200px;
+      height: 150px;
+      background: var(--month-bg);
+      border: 2px dashed var(--month-border);
       display: flex;
       align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
     
-    .date { 
-      color: var(--date-color); 
-      font-size: 0.9rem; 
-      margin-right: 15px;
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-      min-width: 80px;
+    .placeholder-content {
+      text-align: center;
+      color: var(--date-color);
     }
     
-    a { 
-      text-decoration: none; 
-      color: var(--link-color); 
+    .placeholder-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    
+    .placeholder-text {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .post-content {
+      padding: 1.5rem;
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     
-    a:hover { 
-      text-decoration: underline; 
+    .post-header {
+      margin-bottom: 1rem;
+    }
+    
+    .post-date {
+      font-family: 'Courier New', monospace;
+      color: var(--date-color);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .post-title {
+      color: var(--text-color);
+      font-size: 1.3rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 1rem;
+    }
+    
+    .post-tags {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .post-tag {
+      background: var(--link-color);
+      color: white;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .read-more {
+      color: var(--link-color);
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .read-more:hover {
+      text-decoration: underline;
+    }
+    
+    @media (max-width: 768px) {
+      .post-item {
+        flex-direction: column;
+      }
+      
+      .post-image {
+        width: 100%;
+        height: 200px;
+      }
+    }
+    
+    footer {
+      margin-top: 3rem;
+      padding: 2rem 0;
+      border-top: 1px solid var(--header-border);
+      text-align: center;
+      color: var(--date-color);
+      font-size: 0.9rem;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .footer-links a {
+      color: var(--date-color);
+      font-size: 1.2rem;
+      transition: color 0.3s;
+    }
+    
+    .footer-links a:hover {
+      color: var(--link-color);
+    }
+    
+    .footer-info {
+      line-height: 1.5;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>My Blog</h1>
+    <h1>HUI Blog</h1>
     <div>
       <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
         <span class="theme-icon">🌙</span>
@@ -154,43 +253,103 @@
      async function loadPosts() {
        try {
          // 定义已知的markdown文件列表
-         const posts = [
-           { filename: '20250715.md', date: '2025-07-15', title: '2025年7月15日' },
-           { filename: '20250424.md', date: '2025-04-24', title: '2025年4月24日' },
-           { filename: '20241110.md', date: '2024-11-10', title: '2024年11月10日' },
-           { filename: '20241007.md', date: '2024-10-07', title: '2024年10月7日' }
+         const postFiles = [
+           { file: '20250715.md', date: '2025-07-15' },
+           { file: '20250424.md', date: '2025-04-24' },
+           { file: '20241110.md', date: '2024-11-10' },
+           { file: '20241007.md', date: '2024-10-07' }
          ];
          
-         // 按月份分组
-         const groupedPosts = {};
-         posts.forEach(post => {
-           const monthKey = post.date.substring(0, 7); // YYYY-MM
-           if (!groupedPosts[monthKey]) {
-             groupedPosts[monthKey] = [];
-           }
-           groupedPosts[monthKey].push(post);
-         });
+         const posts = [];
          
-         // 按月份排序（最新的在前）
-         const sortedMonths = Object.keys(groupedPosts).sort((a, b) => b.localeCompare(a));
+         // 读取每个markdown文件的元数据和图片
+         for (const postFile of postFiles) {
+           try {
+             const response = await fetch(`posts/${postFile.file}`);
+             const content = await response.text();
+             
+             // 解析front matter
+             const frontMatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
+             let title = `日记 ${postFile.date}`;
+             let tags = [];
+             
+             if (frontMatterMatch) {
+               const frontMatter = frontMatterMatch[1];
+               const titleMatch = frontMatter.match(/title:\s*(.+)/);
+               const tagsMatch = frontMatter.match(/tags:\s*\[([^\]]+)\]/);
+               
+               title = titleMatch ? titleMatch[1].trim() : title;
+               tags = tagsMatch ? tagsMatch[1].split(',').map(tag => tag.trim()) : [];
+             }
+             
+             // 解析文章中的图片
+             let image = null;
+             const imageMatches = content.match(/!\[.*?\]\((images\/[^)]+)\)/g);
+             if (imageMatches && imageMatches.length > 0) {
+               // 提取第一张图片的路径
+               const firstImageMatch = imageMatches[0].match(/!\[.*?\]\((images\/[^)]+)\)/);
+               if (firstImageMatch) {
+                 image = `posts/${firstImageMatch[1]}`;
+               }
+             }
+             
+             posts.push({
+               file: postFile.file,
+               date: postFile.date,
+               title: title,
+               image: image,
+               tags: tags
+             });
+           } catch (error) {
+             console.error(`Error loading ${postFile.file}:`, error);
+             // 如果读取失败，使用默认值
+             posts.push({
+               file: postFile.file,
+               date: postFile.date,
+               title: `日记 ${postFile.date}`,
+               image: null,
+               tags: []
+             });
+           }
+         }
+         
+         // 按日期倒序排列
+         const sortedPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
          
          // 生成HTML
          let html = '';
-         sortedMonths.forEach(month => {
-           html += `<div class="month-group">`;
-           html += `<div class="month-title">${month}</div>`;
-           html += `<ul class="post-list">`;
-           
-           // 按日期排序（最新的在前）
-           const sortedPosts = groupedPosts[month].sort((a, b) => b.date.localeCompare(a.date));
-           
-           sortedPosts.forEach(post => {
-             const dateStr = post.date.substring(5); // MM-DD
-             html += `<li><span class="date">${dateStr}</span><a href="post.html?file=${post.filename}">${post.title}</a></li>`;
+         sortedPosts.forEach(post => {
+           const date = new Date(post.date);
+           const formattedDate = date.toLocaleDateString('en-US', { 
+             year: 'numeric', 
+             month: 'long', 
+             day: 'numeric' 
            });
            
-           html += `</ul>`;
-           html += `</div>`;
+           const tagsHtml = post.tags.map(tag => `<span class="post-tag">${tag}</span>`).join('');
+           
+           const imageHtml = post.image 
+             ? `<img src="${post.image}" alt="${post.title}" class="post-image" />`
+             : `<div class="post-image post-placeholder">
+                 <div class="placeholder-content">
+                   <span class="placeholder-icon">📝</span>
+                   <span class="placeholder-text">No Image</span>
+                 </div>
+               </div>`;
+           
+           html += `
+             <article class="post-item">
+               ${imageHtml}
+               <div class="post-content">
+                 <div class="post-header">
+                   <div class="post-date">${formattedDate}</div>
+                   <h2 class="post-title">${post.title}</h2>
+                   <div class="post-tags">${tagsHtml}</div>
+                 </div>
+                 <a href="post.html?file=${post.file}" class="read-more">Read more →</a>
+               </div>
+             </article>
+           `;
          });
          
          document.getElementById('posts-container').innerHTML = html;
@@ -200,5 +359,18 @@
        }
      }
   </script>
+  
+  <footer>
+    <div class="footer-links">
+      <a href="mailto:your-email@example.com" title="Email">✉</a>
+      <a href="https://github.com/yourusername" title="GitHub">⚡</a>
+      <a href="https://youtube.com/yourchannel" title="YouTube">📺</a>
+      <a href="https://twitter.com/yourusername" title="Twitter">🐦</a>
+    </div>
+    <div class="footer-info">
+      <div>WANG Shudao • © 2025 • Indie Dev Weekly</div>
+      <div>Tailwind Next.js Theme</div>
+    </div>
+  </footer>
 </body>
 </html>
