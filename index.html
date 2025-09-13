@@ -24,6 +24,12 @@
       --month-border: #444;
     }
     
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
     body { 
       font-family: sans-serif; 
       max-width: 700px; 
@@ -31,6 +37,9 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       transition: background-color 0.3s, color 0.3s;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     
     header { 
@@ -182,8 +191,13 @@
       }
     }
     
+    main {
+      flex: 1;
+      padding-bottom: 2rem;
+    }
+    
     footer {
-      margin-top: 3rem;
+      margin-top: auto;
       padding: 2rem 0;
       border-top: 1px solid var(--header-border);
       text-align: center;
@@ -226,11 +240,13 @@
     </div>
   </header>
 
-  <h2>Blog Posts</h2>
-  
-  <div id="posts-container">
-    <p>加载中...</p>
-  </div>
+  <main>
+    <h2>Blog Posts</h2>
+    
+    <div id="posts-container">
+      <p>加载中...</p>
+    </div>
+  </main>
 
   <script>
     function toggleTheme() {
