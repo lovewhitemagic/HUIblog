@@ -104,11 +104,14 @@
   </style>
 </head>
 <body>
+  <!-- 引入文章数据文件 -->
+  <script src="posts-data.js"></script>
+  
   <header>
     <h1>HUI Blog</h1>
     <div>
       <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
-        <span class="theme-icon">🌙</span>
+      <span class="theme-icon">🌙</span>
       </button>
       <a href="index.html" style="margin-left: 1rem;">home</a>
     </div>
@@ -170,17 +173,39 @@
     const file = params.get("file");
 
     if (file) {
-      fetch("posts/" + file)
-        .then(res => res.text())
-        .then(md => {
-          const htmlContent = marked.parse(md);
-          // 修复图片路径：将相对路径转换为正确的路径
-          const fixedContent = htmlContent.replace(/src="images\//g, 'src="posts/images/');
-          document.getElementById("content").innerHTML = fixedContent;
-        })
-        .catch(err => {
-          document.getElementById("content").innerHTML = "<p>无法加载文章。</p>";
-        });
+      // 从静态数据中查找文章信息
+      const post = postsData.find(p => p.file === file);
+      
+      if (post) {
+        // 尝试读取markdown文件
+        fetch("posts/" + file)
+          .then(res => {
+            if (!res.ok) {
+              throw new Error('文件读取失败');
+            }
+            return res.text();
+          })
+          .then(md => {
+            const htmlContent = marked.parse(md);
+            // 修复图片路径：将相对路径转换为正确的路径
+            const fixedContent = htmlContent.replace(/src="images\//g, 'src="posts/images/');
+            document.getElementById("content").innerHTML = fixedContent;
+          })
+          .catch(err => {
+            // 如果fetch失败，显示文章基本信息
+            const fallbackContent = `
+              <h1>${post.title}</h1>
+              <p><strong>发布日期：</strong>${post.date}</p>
+              <p><strong>标签：</strong>${post.tags.join(', ')}</p>
+              ${post.image ? `<img src="${post.image}" alt="文章图片" style="max-width: 100%; height: auto;">` : ''}
+              <p><em>抱歉，无法加载完整的文章内容。这可能是由于GitHub Pages的限制导致的。</em></p>
+              <p><a href="posts/${file}" target="_blank">点击这里查看原始markdown文件</a></p>
+            `;
+            document.getElementById("content").innerHTML = fallbackContent;
+          });
+      } else {
+        document.getElementById("content").innerHTML = "<p>未找到指定的文章。</p>";
+      }
     } else {
       document.getElementById("content").innerHTML = "<p>未指定文章。</p>";
     }
